@@ -1,0 +1,9 @@
+pandas
+duckdb
+pyarrow
+streamlit
+scikit-learn
+xgboost
+requests
+tqdm
+fsspec
