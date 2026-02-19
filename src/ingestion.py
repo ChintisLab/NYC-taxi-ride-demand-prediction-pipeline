@@ -37,9 +37,25 @@ def ingest_to_db(file_path, table_name, db_connector):
     db_connector.execute(query)
     print(f"Ingested {file_path} into {table_name}")
 
+def fetch_zone_lookup():
+    url = "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+    target_path = "data/raw/taxi_zone_lookup.csv"
+    download_file(url, target_path)
+    return target_path
+
+def ingest_csv_to_db(file_path, table_name, db_connector):
+    query = f"CREATE TABLE IF NOT EXISTS {table_name} AS SELECT * FROM read_csv_auto('{file_path}')"
+    db_connector.execute(query)
+    print(f"Ingested {file_path} into {table_name}")
+
 if __name__ == "__main__":
     db = DBConnector()
-    # Test with Jan 2024 data
+    # 1. Fetch trip data
     file_path = fetch_taxi_data(2024, 1)
     ingest_to_db(file_path, "raw_yellow_taxi", db)
+    
+    # 2. Fetch zone lookup
+    zone_path = fetch_zone_lookup()
+    ingest_csv_to_db(zone_path, "taxi_zones", db)
+    
     db.close()
