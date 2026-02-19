@@ -29,6 +29,17 @@ def fetch_taxi_data(year, month, color='yellow'):
     download_file(url, target_path)
     return target_path
 
+import duckdb
+from src.db import DBConnector
+
+def ingest_to_db(file_path, table_name, db_connector):
+    query = f"CREATE TABLE IF NOT EXISTS {table_name} AS SELECT * FROM read_parquet('{file_path}')"
+    db_connector.execute(query)
+    print(f"Ingested {file_path} into {table_name}")
+
 if __name__ == "__main__":
+    db = DBConnector()
     # Test with Jan 2024 data
-    fetch_taxi_data(2024, 1)
+    file_path = fetch_taxi_data(2024, 1)
+    ingest_to_db(file_path, "raw_yellow_taxi", db)
+    db.close()
