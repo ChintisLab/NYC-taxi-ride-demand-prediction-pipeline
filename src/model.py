@@ -4,6 +4,7 @@ import joblib
 from datetime import datetime
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from xgboost import XGBRegressor
 import numpy as np
 
 from src.db import DBConnector
@@ -16,6 +17,17 @@ MODELS_DIR = "models"
 def train_baseline(X_train, y_train):
     model = LinearRegression()
     model.fit(X_train, y_train)
+    return model
+
+
+def train_xgboost(X_train, y_train):
+    model = XGBRegressor(
+        n_estimators=200,
+        max_depth=6,
+        learning_rate=0.1,
+        random_state=42
+    )
+    model.fit(X_train, y_train, verbose=False)
     return model
 
 
@@ -47,6 +59,13 @@ if __name__ == "__main__":
     db.close()
 
     X_train, X_test, y_train, y_test = prepare_datasets(df)
-    model = train_baseline(X_train, y_train)
-    metrics = evaluate(model, X_test, y_test)
-    save_model(model, metrics, "linear_regression")
+
+    print("\n--- Linear Regression ---")
+    lr_model = train_baseline(X_train, y_train)
+    lr_metrics = evaluate(lr_model, X_test, y_test)
+    save_model(lr_model, lr_metrics, "linear_regression")
+
+    print("\n--- XGBoost ---")
+    xgb_model = train_xgboost(X_train, y_train)
+    xgb_metrics = evaluate(xgb_model, X_test, y_test)
+    save_model(xgb_model, xgb_metrics, "xgboost")
