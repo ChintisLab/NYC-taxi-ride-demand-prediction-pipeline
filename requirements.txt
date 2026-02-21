@@ -8,3 +8,4 @@ requests
 tqdm
 fsspec
 joblib
+altair<5.0.0
