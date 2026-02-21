@@ -51,26 +51,6 @@ python main.py --step train     # trains Linear Regression + XGBoost models
 python main.py --step predict --location 161 --hour 17 --dow 2 # quickly test inference directly in CLI
 ```
 
-## Deployment (Streamlit Community Cloud)
-
-You can easily deploy this dashboard to the public web for free using [Streamlit Community Cloud](https://streamlit.io/cloud).
-
-### Prerequisites
-Before deploying, make sure your GitHub repository is public (or you have a Streamlit account connected to your private repo) and that you have run the pipeline locally at least once so the `models/` directory has a trained `.joblib` model.
-
-1. **Commit your trained models and data (Optional but recommended for Cloud):**
-By default, the `data/` and `models/` directories are gitignored. Since Streamlit Cloud doesn't run the `main.py` ingestion/training steps automatically on boot, you need to provide the pre-trained database and models. 
-   - Remove `data/` and `models/` from your `.gitignore`.
-   - Commit and push your local `data/taxi_data.db` and the `.joblib` model files to GitHub.
-
-2. **Deploy on Streamlit Cloud:**
-   - Go to [share.streamlit.io](https://share.streamlit.io) and log in with your GitHub account.
-   - Click **"New app"**.
-   - Select your repository (`ChintisLab/NYC-taxi-ride-demand-prediction-pipeline`).
-   - Set the Main file path to: `src/visualization.py`
-   - Click **"Deploy!"**
-
-Your app will take a minute or two to bake and install the `requirements.txt`. Once finished, Streamlit will give you a public URL you can share!
 
 ## Project Structure
 
