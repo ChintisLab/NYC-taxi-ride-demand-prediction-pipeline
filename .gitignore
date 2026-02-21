@@ -2,7 +2,16 @@ venv/
 __pycache__/
 *.pyc
 .DS_Store
-data/
-models/
 .env
+
+# Ignore raw data and parquet files, but track the processed DB
+data/raw/
+*.parquet
+
+# Explicitly ignore other SQLite/DuckDB databases except our specific one
 *.db
+!data/taxi_data.db
+
+# Do not ignore models folder since it contains our pre-trained artifacts
+# but we can ignore large files if necessary
+models/*.tmp
