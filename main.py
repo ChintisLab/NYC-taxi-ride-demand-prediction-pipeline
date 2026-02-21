@@ -2,11 +2,14 @@ import argparse
 from src.ingestion import fetch_taxi_data, ingest_to_db, fetch_zone_lookup, ingest_csv_to_db
 from src.etl_pipeline import run_etl
 from src.db import DBConnector
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def run_ingestion():
     db = DBConnector()
-    print("=== Data Ingestion ===")
+    logger.info("=== Data Ingestion ===")
 
     file_path = fetch_taxi_data(2024, 1)
     ingest_to_db(file_path, "raw_yellow_taxi", db)
@@ -14,7 +17,7 @@ def run_ingestion():
     zone_path = fetch_zone_lookup()
     ingest_csv_to_db(zone_path, "taxi_zones", db)
 
-    print("Ingestion complete.\n")
+    logger.info("Ingestion complete.\n")
     db.close()
 
 
@@ -28,7 +31,7 @@ def run_training():
 
     X_train, X_test, y_train, y_test = prepare_datasets(df)
 
-    print("\n=== Training ===")
+    logger.info("\n=== Training ===")
     lr = train_baseline(X_train, y_train)
     lr_m = evaluate(lr, X_test, y_test)
     save_model(lr, lr_m, "linear_regression")
@@ -42,13 +45,13 @@ def run_predict(location_id, hour, day_of_week):
     from src.inference import get_latest_model, load_model, predict_demand
     model = load_model(get_latest_model())
     result = predict_demand(model, location_id, hour, day_of_week)
-    print(f"Predicted demand: {result} rides")
+    logger.info(f"Predicted demand: {result} rides")
 
 
 def run_dashboard():
     import os
     import sys
-    print("Launching Streamlit dashboard...")
+    logger.info("Launching Streamlit dashboard...")
     os.system(f"{sys.executable} -m streamlit run src/visualization.py")
 
 
