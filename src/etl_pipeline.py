@@ -20,7 +20,8 @@ def run_etl():
     logger.info(f"Aggregated into {len(demand):,} demand records")
 
     db.execute("DROP TABLE IF EXISTS demand_features")
-    db.conn.execute("CREATE TABLE demand_features AS SELECT * FROM demand", {"demand": demand})
+    db.conn.register("demand_df", demand)
+    db.conn.execute("CREATE TABLE demand_features AS SELECT * FROM demand_df")
     logger.info("Stored demand_features table successfully in DuckDB")
 
     db.close()
