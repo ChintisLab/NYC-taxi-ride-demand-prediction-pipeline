@@ -1,25 +1,27 @@
 from src.db import DBConnector
 from src.processing import clean_data, extract_time_features, aggregate_demand
+from src.logger import get_logger
 
+logger = get_logger(__name__)
 
 def run_etl():
     db = DBConnector()
 
-    print("Running ETL pipeline...")
+    logger.info("Running ETL pipeline...")
     raw_df = db.query_to_df("SELECT * FROM raw_yellow_taxi")
-    print(f"  Loaded {len(raw_df):,} raw rows")
+    logger.info(f"Loaded {len(raw_df):,} raw rows from database")
 
     cleaned = clean_data(raw_df)
-    print(f"  After cleaning: {len(cleaned):,} rows")
+    logger.info(f"After cleaning: {len(cleaned):,} rows remaining")
 
     featured = extract_time_features(cleaned)
 
     demand = aggregate_demand(featured)
-    print(f"  Aggregated into {len(demand):,} demand records")
+    logger.info(f"Aggregated into {len(demand):,} demand records")
 
     db.execute("DROP TABLE IF EXISTS demand_features")
     db.conn.execute("CREATE TABLE demand_features AS SELECT * FROM demand", {"demand": demand})
-    print("  Stored demand_features table in DuckDB")
+    logger.info("Stored demand_features table successfully in DuckDB")
 
     db.close()
     return demand
