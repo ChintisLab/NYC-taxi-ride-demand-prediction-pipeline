@@ -59,6 +59,30 @@ def run_app():
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
                 
+        # --- Map Visualization ---
+        st.markdown("### Average Demand Map (Historical)")
+        # Load rough aggregation for map display (all zones)
+        map_query = f"""
+            SELECT d.PULocationID, z.Borough, z.Zone, AVG(d.ride_count) as avg_rides
+            FROM demand_features d
+            JOIN taxi_zones z ON d.PULocationID = z.LocationID
+            WHERE d.hour = {hour_val} AND d.day_of_week = {dow_int}
+            GROUP BY d.PULocationID, z.Borough, z.Zone
+            ORDER BY avg_rides DESC
+        """
+        try:
+            db = get_db()
+            map_data = db.query_to_df(map_query)
+            db.close()
+            
+            if not map_data.empty:
+                st.dataframe(map_data.head(10), use_container_width=True)
+                st.caption(f"Top 10 High Demand Zones at {hour_val}:00 on {dow_val}s")
+            else:
+                st.info("No historical data available for this time slice.")
+        except Exception as e:
+            st.warning(f"Could not load map data: {e}")
+
     else:
         st.sidebar.error("Could not load taxi zones. Please ensure the ingestion step has been run.")
 
