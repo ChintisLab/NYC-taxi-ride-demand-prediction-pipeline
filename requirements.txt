@@ -8,4 +8,4 @@ requests
 tqdm
 fsspec
 joblib
-altair<5.0.0
+streamlit>=1.35.0
