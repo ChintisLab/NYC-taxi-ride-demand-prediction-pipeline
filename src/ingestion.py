@@ -1,16 +1,19 @@
 import os
 import requests
-import duckdb
 from tqdm import tqdm
 from src.db import DBConnector
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def download_file(url, target_path):
     if os.path.exists(target_path):
-        print(f"File already exists: {target_path}")
+        logger.info(f"File already exists: {target_path}")
         return
 
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    logger.info(f"Starting download: {url}")
     response = requests.get(url, stream=True)
     total_size = int(response.headers.get('content-length', 0))
 
@@ -24,6 +27,8 @@ def download_file(url, target_path):
         for data in response.iter_content(chunk_size=1024):
             size = file.write(data)
             bar.update(size)
+            
+    logger.info(f"Download complete: {target_path}")
 
 
 def fetch_taxi_data(year, month, color='yellow'):
@@ -41,21 +46,23 @@ def fetch_zone_lookup():
 
 
 def ingest_to_db(file_path, table_name, db_connector):
+    logger.info(f"Ingesting parquet file: {file_path}")
     db_connector.execute(f"DROP TABLE IF EXISTS {table_name}")
     db_connector.execute(
         f"CREATE TABLE {table_name} AS SELECT * FROM read_parquet('{file_path}')"
     )
     row_count = db_connector.query_to_df(f"SELECT COUNT(*) as cnt FROM {table_name}")
-    print(f"Ingested {file_path} -> {table_name} ({row_count['cnt'].iloc[0]:,} rows)")
+    logger.info(f"Ingested {file_path} -> {table_name} ({row_count['cnt'].iloc[0]:,} rows)")
 
 
 def ingest_csv_to_db(file_path, table_name, db_connector):
+    logger.info(f"Ingesting CSV file: {file_path}")
     db_connector.execute(f"DROP TABLE IF EXISTS {table_name}")
     db_connector.execute(
         f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto('{file_path}')"
     )
     row_count = db_connector.query_to_df(f"SELECT COUNT(*) as cnt FROM {table_name}")
-    print(f"Ingested {file_path} -> {table_name} ({row_count['cnt'].iloc[0]:,} rows)")
+    logger.info(f"Ingested {file_path} -> {table_name} ({row_count['cnt'].iloc[0]:,} rows)")
 
 
 if __name__ == "__main__":
