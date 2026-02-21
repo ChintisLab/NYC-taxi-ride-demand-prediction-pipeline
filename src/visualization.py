@@ -59,8 +59,29 @@ def run_app():
             except Exception as e:
                 st.error(f"Prediction failed: {e}")
                 
-        # --- Map Visualization ---
-        st.markdown("### Average Demand Map (Historical)")
+        # --- Trend Visualization ---
+        st.markdown(f"### 24-Hour Trend: {selected_zone_display} (Historical {dow_val}s)")
+        trend_query = f"""
+            SELECT hour, AVG(ride_count) as avg_rides
+            FROM demand_features
+            WHERE PULocationID = {selected_location_id} AND day_of_week = {dow_int}
+            GROUP BY hour
+            ORDER BY hour
+        """
+        try:
+            db = get_db()
+            trend_data = db.query_to_df(trend_query)
+            db.close()
+            
+            if not trend_data.empty:
+                st.line_chart(trend_data.set_index('hour')['avg_rides'])
+            else:
+                st.info("No historical trend data available for this selection.")
+        except Exception as e:
+            st.warning(f"Could not load trend data: {e}")
+            
+        # --- Top Zones Table ---
+        st.markdown("### Top 10 High Demand Zones (All NYC)")
         # Load rough aggregation for map display (all zones)
         map_query = f"""
             SELECT d.PULocationID, z.Borough, z.Zone, AVG(d.ride_count) as avg_rides
