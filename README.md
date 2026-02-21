@@ -23,9 +23,14 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the full pipeline:
+Run the full pipeline (ingest, ETL, train):
 ```bash
 python main.py --step all
+```
+
+**Launch the Dashboard** (Interactive Web App):
+```bash
+python main.py --step dashboard
 ```
 
 Run individual steps:
