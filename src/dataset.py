@@ -9,7 +9,7 @@ def split_features_target(df, target_col='ride_count'):
 
 
 def temporal_split(df, test_ratio=0.2):
-    """Split keeping the last N% of data as test (simulates time-based split)."""
+    # keep last chunk as test set for time-series forecasting
     split_idx = int(len(df) * (1 - test_ratio))
     train_df = df.iloc[:split_idx]
     test_df = df.iloc[split_idx:]

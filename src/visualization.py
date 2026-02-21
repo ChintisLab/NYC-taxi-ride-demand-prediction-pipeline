@@ -58,7 +58,7 @@ def run_app():
         st.sidebar.error("Could not load taxi zones. Please ensure the ingestion step has been run.")
         return
         
-    # Create a display string for the dropdown
+    # map borough and zone for a cleaner dropdown
     zones_df['Display'] = zones_df['Zone'] + " (" + zones_df['Borough'] + ")"
     zone_dict = dict(zip(zones_df['Display'], zones_df['LocationID']))
     
@@ -73,7 +73,7 @@ def run_app():
         index=1 # Default Tuesday
     )
     
-    # Mapping dow string to int for model
+    # standard 0-6 monday-sunday mapping
     dow_mapping = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
     dow_int = dow_mapping[dow_val]
     
@@ -96,7 +96,6 @@ def run_app():
                 st.error(f"Prediction failed: {e}")
                 
     with col2:
-        # --- Trend Visualization ---
         st.markdown(f"### 24-Hour Trend: {selected_zone_display} (Historical {dow_val}s)")
         try:
             trend_data = get_trend_data(selected_location_id, dow_int)
@@ -107,7 +106,6 @@ def run_app():
         except Exception as e:
             st.warning(f"Could not load trend data: {e}")
             
-    # --- Top Zones Table ---
     st.markdown("---")
     st.markdown(f"### Top 10 High Demand Zones ({hour_val}:00 on {dow_val}s)")
     try:
