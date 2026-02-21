@@ -1,0 +1,16 @@
+{
+  "site_package_search_strategy": "all",
+  "source_directories": [
+    "."
+  ],
+  "search_path": [
+    "/tmp/nyc-taxi-venv/lib/python3.11/site-packages",
+    "."
+  ],
+  "exclude": [
+    "venv/.*",
+    ".git/.*",
+    "data/.*",
+    "models/.*"
+  ]
+}

@@ -1,9 +1,8 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 
 def split_features_target(df, target_col='ride_count'):
-    feature_cols = [c for c in df.columns if c != target_col]
+    feature_cols = ['PULocationID', 'hour', 'day_of_week', 'is_weekend']
     X = df[feature_cols]
     y = df[target_col]
     return X, y
