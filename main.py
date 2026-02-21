@@ -45,23 +45,32 @@ def run_predict(location_id, hour, day_of_week):
     print(f"Predicted demand: {result} rides")
 
 
+def run_dashboard():
+    import os
+    import sys
+    print("Launching Streamlit dashboard...")
+    os.system(f"{sys.executable} -m streamlit run src/visualization.py")
+
+
 def main():
     parser = argparse.ArgumentParser(description="NYC Taxi Demand Pipeline")
-    parser.add_argument('--step', choices=['ingest', 'etl', 'train', 'predict', 'all'],
+    parser.add_argument('--step', choices=['ingest', 'etl', 'train', 'predict', 'dashboard', 'all'],
                         default='all')
     parser.add_argument('--location', type=int, default=161)
     parser.add_argument('--hour', type=int, default=17)
     parser.add_argument('--dow', type=int, default=2, help="day of week (0=Mon)")
     args = parser.parse_args()
 
-    if args.step in ('ingest', 'all'):
+    if args.step in ('ingest', 'all') and args.step != 'dashboard':
         run_ingestion()
-    if args.step in ('etl', 'all'):
+    if args.step in ('etl', 'all') and args.step != 'dashboard':
         run_etl()
-    if args.step in ('train', 'all'):
+    if args.step in ('train', 'all') and args.step != 'dashboard':
         run_training()
     if args.step == 'predict':
         run_predict(args.location, args.hour, args.dow)
+    if args.step == 'dashboard':
+        run_dashboard()
 
 
 if __name__ == "__main__":
