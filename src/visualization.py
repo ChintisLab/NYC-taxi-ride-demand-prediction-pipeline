@@ -6,6 +6,27 @@ import streamlit as st
 import pandas as pd
 from src.db import DBConnector
 
+@st.cache_resource
+def initialize_app():
+    """Auto-run pipeline on Streamlit Cloud if DB doesn't exist."""
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    db_path = os.path.join(project_root, 'data', 'taxi_data.db')
+    
+    if not os.path.exists(db_path):
+        import sys
+        if project_root not in sys.path:
+            sys.path.append(project_root)
+            
+        with st.spinner("First boot: Downloading NYC Taxi Data & Training Models (this takes ~1-2 minutes)..."):
+            from main import run_ingestion, run_etl, run_training
+            run_ingestion()
+            run_etl()
+            run_training()
+    return True
+
+# Call initialization early
+initialize_app()
+
 def get_db():
     return DBConnector()
 
